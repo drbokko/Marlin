@@ -35,6 +35,53 @@
   #define DISPLAY_CHARSET_ISO10646_1 // use the better font on full graphic displays.
 #endif
 
+// Splashscreen
+
+#ifndef MSG_SPLASH_NAME
+  #define MSG_SPLASH_NAME                    "   VERTEX NANO"
+#endif
+
+#ifndef MSG_SPLASH_FIRMWARE
+  #define MSG_SPLASH_FIRMWARE                "       V1.0"
+#endif
+
+#ifndef MSG_SPLASH_WEBSITE1
+  #define MSG_SPLASH_WEBSITE1                "vertex3dprinter.eu"
+#endif
+
+#ifndef MSG_SPLASH_WEBSITE2
+  #define MSG_SPLASH_WEBSITE2                "   velleman.eu"
+#endif
+
+#ifndef MSG_BOOT_LINE2
+  #define MSG_BOOT_LINE2                     "VERTEX NANO"
+#endif
+
+// Splashscreen
+
+// Added Vertex Nano menu items
+
+#ifndef MSG_FIRMWARE
+  #define MSG_FIRMWARE                        "Firmware version"
+#endif
+#ifndef MSG_LED_MENU
+	#define MSG_LED_MENU 					  "LED brightness"
+#endif
+
+
+#define MSG_LOAD_FILAMENT "(Un)load filament"
+#define MSG_LOAD_ABS "Load ABS"
+#define MSG_UNLOAD_ABS "Unload ABS"
+#define MSG_LOAD_PLA "Load PLA"
+#define MSG_UNLOAD_PLA "Unload PLA"
+#define MSG_LOAD_TEXT0 " Insert filament"
+#define MSG_LOAD_TEXT1 " until 1.5cm is"
+#define MSG_LOAD_TEXT2 " visible in tube"
+#define MSG_LOAD_TEXT3 "Then press button"
+
+
+// Added Vertex Nano menu items
+
 #ifndef WELCOME_MSG
   #define WELCOME_MSG                         MACHINE_NAME " ready."
 #endif
@@ -91,6 +138,9 @@
 #endif
 #ifndef MSG_SET_ORIGIN
   #define MSG_SET_ORIGIN                      "Set origin"
+#endif
+#ifndef MSG_PREHEAT_1
+  #define MSG_PREHEAT                         "Preheat"
 #endif
 #ifndef MSG_PREHEAT_1
   #define MSG_PREHEAT_1                       "Preheat PLA"
@@ -219,7 +269,7 @@
   #define MSG_FLOW                            "Flow"
 #endif
 #ifndef MSG_CONTROL
-  #define MSG_CONTROL                         "Control"
+  #define MSG_CONTROL                         "Settings"
 #endif
 #ifndef MSG_MIN
   #define MSG_MIN                             " " LCD_STR_THERMOMETER " Min"
@@ -366,10 +416,10 @@
   #define MSG_WATCH                           "Info screen"
 #endif
 #ifndef MSG_PREPARE
-  #define MSG_PREPARE                         "Prepare"
+  #define MSG_PREPARE                         "Control printer"
 #endif
 #ifndef MSG_TUNE
-  #define MSG_TUNE                            "Tune"
+  #define MSG_TUNE                            "Tune print job"
 #endif
 #ifndef MSG_PAUSE_PRINT
   #define MSG_PAUSE_PRINT                     "Pause print"

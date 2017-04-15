@@ -354,6 +354,8 @@ const char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 
 static int serial_count = 0;
 
+int vertexLedBrightness = 100;
+
 // GCode parameter pointer used by code_seen(), code_value_float(), etc.
 static char* seen_pointer;
 
@@ -834,6 +836,12 @@ void servo_init() {
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
 #endif
 
+// Set led brightness according to current variable
+void set_led_brightness()
+{
+	analogWrite(7, map(vertexLedBrightness, 0, 100, 0, 255));
+}
+	
 /**
  * Marlin entry-point: Set up before the program loop
  *  - Set up the kill pin, filament runout, power hold
@@ -853,6 +861,8 @@ void servo_init() {
  *    • status LEDs
  */
 void setup() {
+
+	set_led_brightness();
 
   #ifdef DISABLE_JTAG
     // Disable JTAG on AT90USB chips to free up pins for IO

@@ -86,7 +86,7 @@
    * If you get false positives for "Heating failed" increase WATCH_TEMP_PERIOD and/or decrease WATCH_TEMP_INCREASE
    * WATCH_TEMP_INCREASE should not be below 2.
    */
-  #define WATCH_TEMP_PERIOD 20                // Seconds
+  #define WATCH_TEMP_PERIOD 60                // Seconds
   #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
@@ -170,8 +170,8 @@
 
 //  extruder run-out prevention.
 //if the machine is idle, and the temperature over MINTEMP, every couple of SECONDS some filament is extruded
-//#define EXTRUDER_RUNOUT_PREVENT
-#define EXTRUDER_RUNOUT_MINTEMP 190
+#define EXTRUDER_RUNOUT_PREVENT
+#define EXTRUDER_RUNOUT_MINTEMP 180
 #define EXTRUDER_RUNOUT_SECONDS 30
 #define EXTRUDER_RUNOUT_ESTEPS 14   // mm filament
 #define EXTRUDER_RUNOUT_SPEED 1500  // extrusion speed
@@ -318,7 +318,7 @@
 #define Y_HOME_BUMP_MM 5
 #define Z_HOME_BUMP_MM 2
 #define HOMING_BUMP_DIVISOR {2, 2, 4}  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
-//#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
+#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
 
 // When G28 is called, this option will make Y home before X
 //#define HOME_Y_BEFORE_X
@@ -420,10 +420,10 @@
   #define SDCARD_RATHERRECENTFIRST  //reverse file order of sd card menu display. Its sorted practically after the file system block order.
   // if a file is deleted, it frees a block. hence, the order is not purely chronological. To still have auto0.g accessible, there is again the option to do that.
   // using:
-  //#define MENU_ADDAUTOSTART
+  #define MENU_ADDAUTOSTART
 
   // Show a progress bar on HD44780 LCDs for SD printing
-  //#define LCD_PROGRESS_BAR
+  #define LCD_PROGRESS_BAR
 
   #if ENABLED(LCD_PROGRESS_BAR)
     // Amount of time (ms) to show the bar
@@ -433,7 +433,7 @@
     // Amount of time (ms) to retain the status message (0=forever)
     #define PROGRESS_MSG_EXPIRE   0
     // Enable this to show messages for MSG_TIME then hide them
-    //#define PROGRESS_MSG_ONCE
+    #define PROGRESS_MSG_ONCE
   #endif
 
   // This allows hosts to request long names for files and folders with M33
@@ -555,7 +555,7 @@ const unsigned int dropsegments = 5; //everything with less than this number of 
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 26
 
 // Transfer Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.

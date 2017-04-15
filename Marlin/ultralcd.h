@@ -42,7 +42,15 @@
   bool lcd_detected(void);
   void lcd_kill_screen();
   void kill_screen(const char* lcd_msg);
-
+  void lcd_preheat_pla0();
+  void lcd_preheat_abs0();
+  void lcd_load_menu_ABS();
+  void lcd_load_menu_ABS_go();
+  void lcd_load_menu_PLA();
+  void lcd_load_menu_PLA_go();
+  void lcd_unload_menu_ABS();
+  void lcd_unload_menu_PLA();
+  
   #if HAS_BUZZER
     void lcd_buzz(long duration, uint16_t freq);
   #endif

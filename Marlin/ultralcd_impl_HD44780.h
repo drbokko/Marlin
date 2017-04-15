@@ -390,6 +390,13 @@ char lcd_print(const char* str) {
 
 unsigned lcd_print(char c) { return charset_mapper(c); }
 
+  char *logosplash[] = {
+    "\xff\x20\xff\x20\x20\xff\xff\xff\x20\x20\xff\xff\xff\x20\x20\xff\xff\xff\x20\x20\xff\xff\xff\x20\x20\xff\x20\xff\x20\x20\x20\x20\xff\x20\xff\x20\x20\xff\xff\xff\x20\x20\xff\x20\xff\x20\x20\xff\xff\xff\x20\x20",
+    "\xff\x20\xff\x20\x20\xff\x03\x03\x20\x20\xff\x20\xff\x20\x20\x20\xff\x20\x20\x20\xff\x03\x03\x20\x20\x20\xff\x20\x20\x20\x20\x20\xff\x01\xff\x20\x20\xff\x20\xff\x20\x20\xff\x01\xff\x20\x20\xff\x20\xff\x20\x20",
+    "\xff\x20\xff\x20\x20\xff\x04\x04\x20\x20\xff\xff\x20\x20\x20\x20\xff\x20\x20\x20\xff\x04\x04\x20\x20\x20\xff\x20\x20\x20\x20\x20\xff\x02\xff\x20\x20\xff\xff\xff\x20\x20\xff\x02\xff\x20\x20\xff\x20\xff\x20\x20",
+    "\x20\xff\x20\x20\x20\xff\xff\xff\x20\x20\xff\x20\xff\x20\x20\x20\xff\x20\x20\x20\xff\xff\xff\x20\x20\xff\x20\xff\x20\x20\x20\x20\xff\x20\xff\x20\x20\xff\x20\xff\x20\x20\xff\x20\xff\x20\x20\xff\xff\xff\x20\x20"
+  };
+
 #if ENABLED(SHOW_BOOTSCREEN)
 
   void lcd_erase_line(int line) {
@@ -457,6 +464,49 @@ unsigned lcd_print(char c) { return charset_mapper(c); }
       B00000,
       B00000,
       B00000
+    };
+	byte half_left[8] = {
+      B11100,
+      B11100,
+      B11100,
+      B11100,
+      B11100,
+      B11100,
+      B11100,
+      B11100
+    };
+    
+     byte half_right[8] = {
+      B00111,
+      B00111,
+      B00111,
+      B00111,
+      B00111,
+      B00111,
+      B00111,
+      B00111
+    };
+    
+  byte half_top[8] = {
+      B11111,
+      B11111,
+      B11111,
+      B11111,
+      B00000,
+      B00000,
+      B00000,
+      B00000
+    };
+    
+  byte half_bottom[8] = {
+      B00000,
+      B00000,
+      B00000,
+      B00000,
+      B11111,
+      B11111,
+      B11111,
+      B11111
     };
     lcd.createChar(0, top_left);
     lcd.createChar(1, top_right);
@@ -533,6 +583,87 @@ unsigned lcd_print(char c) { return charset_mapper(c); }
       false
     #endif
     );
+	
+//VertexNano Bootscreen//
+
+    lcd.clear();
+    
+    pinMode(BTN_ENC,INPUT);
+    pinMode(BTN_EN1,INPUT);
+    pinMode(BTN_EN2,INPUT);
+    WRITE(BTN_EN1,HIGH);
+    WRITE(BTN_EN2,HIGH);
+    WRITE(BTN_ENC,HIGH);
+    
+    int width = 20; // screen width
+    int stp = 2;
+    int lngth = 52;
+    
+    lcd.createChar(1, half_left);
+    lcd.createChar(2, half_right);
+    lcd.createChar(3, half_bottom);
+    lcd.createChar(4, half_top);
+    
+    for (int m=width-1; m>=0; m-=stp) { 
+      for (int i=0; i<4; i++) {
+        String line = logosplash[i];
+        lcd.setCursor(m, i);
+        lcd.print(line.substring(0, width - m));
+      }
+      
+      lcd.display();
+      for (int n=0; n<255; n++) {
+        safe_delay(1);
+        thermalManager.manage_heater();
+        if((READ(BTN_ENC)==0) || (READ(BTN_EN1)==0) || (READ(BTN_EN2)==0))
+        {
+          goto bailout;
+        }
+      }
+      lcd.noDisplay();
+     }
+   
+    for (int m=1; m<lngth; m+=stp) {
+      for (int i=0; i<4; i++) {
+        String line = logosplash[i];
+        lcd.setCursor(0, i);
+        lcd.print(line.substring(m, width+m));
+      }
+      lcd.display();
+      for (int b=0; b<255; b++) {
+        safe_delay(1);
+        thermalManager.manage_heater();
+        if((READ(BTN_ENC)==0) || (READ(BTN_EN1)==0) || (READ(BTN_EN2)==0))
+        {
+          goto bailout;
+        }
+      }
+      lcd.noDisplay();
+    }
+  
+    // Firmware
+    lcd.clear();
+    lcd.setCursor(1, 0);
+    lcd.print(MSG_SPLASH_NAME);
+    lcd.setCursor(1, 1);
+    lcd.print(MSG_SPLASH_FIRMWARE);
+    lcd.setCursor(1, 2);
+    lcd.print(MSG_SPLASH_WEBSITE1);
+    lcd.setCursor(1, 3);
+    lcd.print(MSG_SPLASH_WEBSITE2);
+    lcd.display();
+    
+    for (int b=0; b<255; b++) {
+      safe_delay(11);
+      thermalManager.manage_heater();
+      if((READ(BTN_ENC)==0) || (READ(BTN_EN1)==0) || (READ(BTN_EN2)==0))
+      {
+        goto bailout;
+      }
+    }
+    
+    bailout:
+      safe_delay(100);
   }
 
 #endif // SHOW_BOOTSCREEN

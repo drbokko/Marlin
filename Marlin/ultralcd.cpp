@@ -36,7 +36,7 @@
 
 int preheatHotendTemp1, preheatBedTemp1, preheatFanSpeed1,
     preheatHotendTemp2, preheatBedTemp2, preheatFanSpeed2;
-
+	
 #if ENABLED(FILAMENT_LCD_DISPLAY)
   millis_t previous_lcd_status_ms = 0;
 #endif
@@ -108,6 +108,12 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void lcd_control_temperature_preheat_abs_settings_menu();
   static void lcd_control_motion_menu();
   static void lcd_control_volumetric_menu();
+  
+    //VERTEX NANO MENUS
+  static void lcd_led_menu();
+  static void lcd_load_menu();
+  static void preheat_menu();
+  static void lcd_firmware_menu();
 
   #if ENABLED(LCD_INFO_MENU)
     #if ENABLED(PRINTCOUNTER)
@@ -569,7 +575,8 @@ void kill_screen(const char* lcd_msg) {
       clear_command_queue();
       quickstop_stepper();
       print_job_timer.stop();
-      thermalManager.autotempShutdown();
+      //thermalManager.autotempShutdown();
+	  thermalManager.disable_all_heaters(); // Test to disable the heating instead of using autotemp
       wait_for_heatup = false;
       lcd_setstatus(MSG_PRINT_ABORTED, true);
     }
@@ -583,6 +590,7 @@ void kill_screen(const char* lcd_msg) {
    */
 
   static void lcd_main_menu() {
+    
     START_MENU();
     MENU_ITEM(back, MSG_WATCH);
     if (planner.movesplanned() || IS_SD_PRINTING) {
@@ -623,10 +631,130 @@ void kill_screen(const char* lcd_msg) {
     #if ENABLED(LCD_INFO_MENU)
       MENU_ITEM(submenu, MSG_INFO_MENU, lcd_info_menu);
     #endif
-
+	MENU_ITEM(submenu, MSG_FIRMWARE, lcd_firmware_menu);
     END_MENU();
   }
+  
+	void lcd_firmware_menu()
+	{
+	  START_MENU();
+	  MENU_ITEM(function, MSG_SPLASH_NAME, lcd_return_to_status);
+	  MENU_ITEM(function, MSG_SPLASH_FIRMWARE, lcd_return_to_status);
+	  MENU_ITEM(function, MSG_SPLASH_WEBSITE1, lcd_return_to_status);
+	  MENU_ITEM(function, MSG_SPLASH_WEBSITE2, lcd_return_to_status);
+	  END_MENU();
+	}
+		
+	void preheat_menu()
+	{
+	  START_MENU();  
+	  MENU_ITEM(back, MSG_PREHEAT);
+	  MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
+      MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
+	  END_MENU();
+	}
+		
+	void lcd_load_menu()
+	{
+	  START_MENU();  
+	  MENU_ITEM(back, MSG_LOAD_FILAMENT);
+	  MENU_ITEM(submenu, MSG_LOAD_ABS, lcd_load_menu_ABS);
+	  MENU_ITEM(submenu, MSG_LOAD_PLA, lcd_load_menu_PLA);
+	  MENU_ITEM(submenu, MSG_UNLOAD_ABS, lcd_unload_menu_ABS);
+	  MENU_ITEM(submenu, MSG_UNLOAD_PLA, lcd_unload_menu_PLA);
+	  END_MENU();
+	}
+	
+	void lcd_load_menu_ABS()
+	{
+	  START_MENU();
+	  MENU_ITEM(function, MSG_LOAD_TEXT0, lcd_load_menu_ABS_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT1, lcd_load_menu_ABS_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT2, lcd_load_menu_ABS_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT3, lcd_load_menu_ABS_go);
+	  END_MENU();
+	}
+	
+	void lcd_load_menu_PLA()
+	{
+	  START_MENU();
+	  MENU_ITEM(function, MSG_LOAD_TEXT0, lcd_load_menu_PLA_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT1, lcd_load_menu_PLA_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT2, lcd_load_menu_PLA_go);
+	  MENU_ITEM(function, MSG_LOAD_TEXT3, lcd_load_menu_PLA_go);
+	  END_MENU();
+	}
+	
+	void lcd_load_menu_ABS_go()
+	{
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S235"));
+	  enqueue_and_echo_commands_P(PSTR("G28"));
+	  enqueue_and_echo_commands_P(PSTR("M109 T0 S235"));
+	  enqueue_and_echo_commands_P(PSTR("G92 E0"));
+	  enqueue_and_echo_commands_P(PSTR("M83"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E430 F1000"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E70 F100"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Loading filament    "));
+	  enqueue_and_echo_commands_P(PSTR("M84"));
+	  enqueue_and_echo_commands_P(PSTR("M82"));
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S0"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Vertex Nano ready   "));
+	  lcd_return_to_status();
+	}
 
+	void lcd_load_menu_PLA_go()
+	{
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S190"));
+	  enqueue_and_echo_commands_P(PSTR("G28"));
+	  enqueue_and_echo_commands_P(PSTR("M109 T0 S190"));
+	  enqueue_and_echo_commands_P(PSTR("G92 E0"));
+	  enqueue_and_echo_commands_P(PSTR("M83"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E430 F1000"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E70 F100"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Loading filament    "));
+	  enqueue_and_echo_commands_P(PSTR("M84"));
+	  enqueue_and_echo_commands_P(PSTR("M82"));
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S0"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Vertex Nano ready   "));
+	  lcd_return_to_status();
+	}
+	
+	void lcd_unload_menu_ABS()
+	{
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S235"));
+	  enqueue_and_echo_commands_P(PSTR("G28"));
+	  enqueue_and_echo_commands_P(PSTR("M109 T0 S235"));
+	  enqueue_and_echo_commands_P(PSTR("G92 E0"));
+	  enqueue_and_echo_commands_P(PSTR("M83"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E10 F50"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E-30 F100"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E-550 F1000"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Unloading filament  "));
+	  enqueue_and_echo_commands_P(PSTR("M84"));
+	  enqueue_and_echo_commands_P(PSTR("M82"));
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S0"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Vertex Nano ready   "));
+	  lcd_return_to_status();
+	}
+	
+		void lcd_unload_menu_PLA()
+	{
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S190"));
+	  enqueue_and_echo_commands_P(PSTR("G28"));
+	  enqueue_and_echo_commands_P(PSTR("M109 T0 S190"));
+	  enqueue_and_echo_commands_P(PSTR("G92 E0"));
+	  enqueue_and_echo_commands_P(PSTR("M83"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E10 F50"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E-30 F100"));
+	  enqueue_and_echo_commands_P(PSTR("G1 E-550 F1000"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Unloading filament  "));
+	  enqueue_and_echo_commands_P(PSTR("M84"));
+	  enqueue_and_echo_commands_P(PSTR("M82"));
+	  enqueue_and_echo_commands_P(PSTR("M104 T0 S0"));
+	  enqueue_and_echo_commands_P(PSTR("M117 Vertex Nano ready   "));
+	  lcd_return_to_status();
+	}
+	
   /**
    *
    * "Tune" submenu items
@@ -639,6 +767,7 @@ void kill_screen(const char* lcd_msg) {
   void lcd_set_home_offsets() {
     // M428 Command
     enqueue_and_echo_commands_P(PSTR("M428"));
+	enqueue_and_echo_commands_P(PSTR("M500"));
     lcd_return_to_status();
   }
 
@@ -726,6 +855,9 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     //
     MENU_ITEM(back, MSG_MAIN);
+	
+	MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(int3, MSG_LED_MENU, &vertexLedBrightness, 0, 100, set_led_brightness);
+
 
     //
     // Speed:
@@ -936,6 +1068,7 @@ void kill_screen(const char* lcd_msg) {
       START_MENU();
       MENU_ITEM(back, MSG_PREPARE);
       #if HOTENDS == 1
+
         MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
       #else
         MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H1, lcd_preheat_abs0);
@@ -1182,21 +1315,18 @@ void kill_screen(const char* lcd_msg) {
     //
     MENU_ITEM(back, MSG_MAIN);
 
-    //
     // Auto Home
-    //
     MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
-    #if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
+	// load filament
+	MENU_ITEM(submenu, MSG_LOAD_FILAMENT, lcd_load_menu);
+	//	INDIVIDUAL_AXIS_HOMING_MENU
+		#if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
       MENU_ITEM(gcode, MSG_AUTO_HOME_X, PSTR("G28 X"));
       MENU_ITEM(gcode, MSG_AUTO_HOME_Y, PSTR("G28 Y"));
       MENU_ITEM(gcode, MSG_AUTO_HOME_Z, PSTR("G28 Z"));
     #endif
 
-    //
-    // Set Home Offsets
-    //
-    MENU_ITEM(function, MSG_SET_HOME_OFFSETS, lcd_set_home_offsets);
-    //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
+
 
     //
     // Level Bed
@@ -1209,51 +1339,60 @@ void kill_screen(const char* lcd_msg) {
       MENU_ITEM(submenu, MSG_LEVEL_BED, lcd_level_bed);
     #endif
 
-    //
-    // Move Axis
-    //
-    MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
+
 
     //
     // Disable Steppers
     //
-    MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
+    //MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
 
     //
-    // Preheat PLA
-    // Preheat ABS
+    // Preheat
     //
-    #if TEMP_SENSOR_0 != 0
-      #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_3 != 0 || TEMP_SENSOR_BED != 0
-        MENU_ITEM(submenu, MSG_PREHEAT_1, lcd_preheat_pla_menu);
-        MENU_ITEM(submenu, MSG_PREHEAT_2, lcd_preheat_abs_menu);
-      #else
-        MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
-        MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
-      #endif
-    #endif
-
+	MENU_ITEM(submenu, MSG_PREHEAT, preheat_menu);
+	
+    //#if TEMP_SENSOR_0 != 0
+    //  #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_3 != 0 || TEMP_SENSOR_BED != 0
+    //    MENU_ITEM(submenu, MSG_PREHEAT_1, lcd_preheat_pla_menu);
+    //    MENU_ITEM(submenu, MSG_PREHEAT_2, lcd_preheat_abs_menu);
+    //  #else
+    //    MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
+    //    MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
+    //  #endif
+    //#endif
+    //
+    // Move Axis
+    //
+    MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
+	MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(int3, MSG_LED_MENU, &vertexLedBrightness, 0, 100, set_led_brightness);
+	    //
+    // Set Home Offsets
+    //
+    MENU_ITEM(function, MSG_SET_HOME_OFFSETS, lcd_set_home_offsets);
+    //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
+	
+	
     //
     // Cooldown
     //
-    MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
+    //MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
 
     //
     // Switch power on/off
     //
-    #if HAS_POWER_SWITCH
-      if (powersupply)
-        MENU_ITEM(gcode, MSG_SWITCH_PS_OFF, PSTR("M81"));
-      else
-        MENU_ITEM(gcode, MSG_SWITCH_PS_ON, PSTR("M80"));
-    #endif
+    //#if HAS_POWER_SWITCH
+    //  if (powersupply)
+    //    MENU_ITEM(gcode, MSG_SWITCH_PS_OFF, PSTR("M81"));
+    //  else
+    //    MENU_ITEM(gcode, MSG_SWITCH_PS_ON, PSTR("M80"));
+    //#endif
 
     //
     // Autostart
     //
-    #if ENABLED(SDSUPPORT) && ENABLED(MENU_ADDAUTOSTART)
-      MENU_ITEM(function, MSG_AUTOSTART, lcd_autostart_sd);
-    #endif
+    //#if ENABLED(SDSUPPORT) && ENABLED(MENU_ADDAUTOSTART)
+    //  MENU_ITEM(function, MSG_AUTOSTART, lcd_autostart_sd);
+    //#endif
 
     END_MENU();
   }
@@ -1620,22 +1759,22 @@ void kill_screen(const char* lcd_msg) {
     //
     // Fan Speed:
     //
-    #if FAN_COUNT > 0
-      #if HAS_FAN0
-        #if FAN_COUNT > 1
-          #define MSG_1ST_FAN_SPEED MSG_FAN_SPEED " 1"
-        #else
-          #define MSG_1ST_FAN_SPEED MSG_FAN_SPEED
-        #endif
-        MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_1ST_FAN_SPEED, &fanSpeeds[0], 0, 255);
-      #endif
-      #if HAS_FAN1
-        MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED " 2", &fanSpeeds[1], 0, 255);
-      #endif
-      #if HAS_FAN2
-        MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED " 3", &fanSpeeds[2], 0, 255);
-      #endif
-    #endif // FAN_COUNT > 0
+    //#if FAN_COUNT > 0
+    //  #if HAS_FAN0
+    //    #if FAN_COUNT > 1
+    //      #define MSG_1ST_FAN_SPEED MSG_FAN_SPEED " 1"
+    //    #else
+    //      #define MSG_1ST_FAN_SPEED MSG_FAN_SPEED
+    //    #endif
+    //    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_1ST_FAN_SPEED, &fanSpeeds[0], 0, 255);
+    //  #endif
+    //  #if HAS_FAN1
+    //    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED " 2", &fanSpeeds[1], 0, 255);
+    //  #endif
+    //  #if HAS_FAN2
+    //    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED " 3", &fanSpeeds[2], 0, 255);
+    //  #endif
+    //#endif // FAN_COUNT > 0
 
     //
     // Autotemp, Min, Max, Fact

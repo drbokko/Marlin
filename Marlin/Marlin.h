@@ -295,6 +295,9 @@ int code_value_int();
 float code_value_temp_abs();
 float code_value_temp_diff();
 
+extern int vertexLedBrightness;
+void set_led_brightness();
+
 #if ENABLED(DELTA)
   extern float delta[3];
   extern float endstop_adj[3]; // axis[n].endstop_adj
